@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ContactManager.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using ContactManager.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,18 @@ builder.Services.AddControllers(config =>
             .Build();
     config.Filters.Add(new AuthorizeFilter(policy));
 });
+
+
+
+// Authorization handlers.
+builder.Services.AddScoped<IAuthorizationHandler,
+                      ContactIsOwnerAuthorizationHandler>();
+
+builder.Services.AddSingleton<IAuthorizationHandler,
+                      ContactAdministratorsAuthorizationHandler>();
+
+builder.Services.AddSingleton<IAuthorizationHandler,
+                      ContactManagerAuthorizationHandler>();
 
 
 
