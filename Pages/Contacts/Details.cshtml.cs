@@ -10,35 +10,68 @@ using ContactManager.Models;
 
 namespace ContactManager.Pages.Contacts
 {
-    public class DetailsModel : PageModel
+    public class DetailsModel : DI_BasePageModel
+{
+    public DetailsModel(
+        ApplicationDbContext context,
+        IAuthorizationService authorizationService,
+        UserManager<IdentityUser> userManager)
+        : base(context, authorizationService, userManager)
     {
-        private readonly ApplicationDbContext _context;
+    }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public DetailsModel(ApplicationDbContext context)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public Contact Contact { get; set; }
+
+    public async Task<IActionResult> OnGetAsync(int id)
+    {
+        Contact? _contact = await Context.Contact.FirstOrDefaultAsync(m => m.ContactId == id);
+
+        if (_contact == null)
         {
-            _context = context;
+            return NotFound();
+        }
+        Contact = _contact;
+
+        var isAuthorized = User.IsInRole(Constants.ContactManagersRole) ||
+                           User.IsInRole(Constants.ContactAdministratorsRole);
+
+        var currentUserId = UserManager.GetUserId(User);
+
+        if (!isAuthorized
+            && currentUserId != Contact.OwnerID
+            && Contact.Status != ContactStatus.Approved)
+        {
+            return Forbid();
         }
 
-        public Contact Contact { get; set; }
+        return Page();
+    }
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+    public async Task<IActionResult> OnPostAsync(int id, ContactStatus status)
+    {
+        var contact = await Context.Contact.FirstOrDefaultAsync(
+                                                  m => m.ContactId == id);
+
+        if (contact == null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-#pragma warning disable CS8601 // Possible null reference assignment.
-            Contact = await _context.Contact.FirstOrDefaultAsync(m => m.ContactId == id);
-#pragma warning restore CS8601 // Possible null reference assignment.
-
-            if (Contact == null)
-            {
-                return NotFound();
-            }
-            return Page();
+            return NotFound();
         }
+
+        var contactOperation = (status == ContactStatus.Approved)
+                                                   ? ContactOperations.Approve
+                                                   : ContactOperations.Reject;
+
+        var isAuthorized = await AuthorizationService.AuthorizeAsync(User, contact,
+                                    contactOperation);
+        if (!isAuthorized.Succeeded)
+        {
+            return Forbid();
+        }
+        contact.Status = status;
+        Context.Contact.Update(contact);
+        await Context.SaveChangesAsync();
+
+        return RedirectToPage("./Index");
+        // jairo123
     }
 }
