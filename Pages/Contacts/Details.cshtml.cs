@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using ContactManager.Data;
 using ContactManager.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using ContactManager.Authorization;
 
 namespace ContactManager.Pages.Contacts
 {
@@ -74,4 +77,5 @@ namespace ContactManager.Pages.Contacts
         return RedirectToPage("./Index");
         // jairo123
     }
+}
 }

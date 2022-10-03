@@ -1,7 +1,10 @@
 using ContactManager.Data;
 using ContactManager.Models;
+using ContactManager.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ContactManager.Pages.Contacts
 {

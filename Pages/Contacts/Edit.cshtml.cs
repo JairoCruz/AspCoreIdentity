@@ -1,5 +1,8 @@
+using ContactManager.Authorization;
 using ContactManager.Data;
 using ContactManager.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -93,9 +96,11 @@ namespace ContactManager.Pages.Contacts
 
         return RedirectToPage("./Index");
 
-        private bool ContactExists(int id)
+        /*private bool ContactExists(int id)
         {
             return _context.Contact.Any(e => e.ContactId == id);
-        }
+        }*/
     }
+}
+
 }

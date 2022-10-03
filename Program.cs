@@ -64,7 +64,7 @@ using (var scope = app.Services.CreateScope())
 
     var testUserPw = builder.Configuration.GetValue<string>("SeedUserPW");
 
-    await SeedData.Initialize(services);
+    await SeedData.Initialize(services, "jairo123#$_K");
 }
 
 if (app.Environment.IsDevelopment())
